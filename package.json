@@ -1,0 +1,22 @@
+{
+  "name": "ltc2309",
+  "version": "0.0.1",
+  "description": "Module to controle the ltc2309",
+  "main": "i2c-ltc2309.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JW94/LTC2309.git"
+  },
+  "keywords": [
+    "ltc2309"
+  ],
+  "author": "Jonathan Weinert <jo.weinert@h2o-protec.de>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JW94/LTC2309/issues"
+  },
+  "homepage": "https://github.com/JW94/LTC2309#readme"
+}
