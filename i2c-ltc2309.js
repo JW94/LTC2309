@@ -39,8 +39,6 @@ var ltc2309 = function(device, address)
 
 ltc2309.prototype.getADCRaw = function(channel,Mode,callback)
 {
-    //console.log("Unimode-Value: " + UNI_MODE);
-    //console.log("Channel-Value: " + CHANNELS[channel]);
     var self = this;
     // Discard first 
     self.wire.readBytes(CHANNELS[channel] + Mode,2, function(err,data){});
@@ -136,6 +134,7 @@ ltc2309.prototype.iterate = function(iterations, process, exit)
     loop.next();
 };
 
+// Some tests
 //var adcx = new ltc2309('/dev/i2c-2',0x0A);
 // adcx.getADCVoltAll(UNI_MODE,function(data)
 // {
