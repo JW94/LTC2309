@@ -24,16 +24,28 @@ var ltc2309 = function(device, address)
     this.device = device;
     this.address = address;
     this.wire = new i2c(this.address,{device: this.device});
+    this.CH_Values = 
+    {
+        "adcV0": 0x00,
+        "adcV1": 0x00,
+        "adcV2": 0x00,
+        "adcV3": 0x00,
+        "adcV4": 0x00,
+        "adcV5": 0x00,
+        "adcV6": 0x00,
+        "adcV7": 0x00,
+    };
 }
 
 ltc2309.prototype.getADCRaw = function(channel,Mode,callback)
 {
-    console.log("Unimode-Value: " + UNI_MODE);
-    console.log("Channel-Value: " + CHANNELS[channel]);
+    //console.log("Unimode-Value: " + UNI_MODE);
+    //console.log("Channel-Value: " + CHANNELS[channel]);
+    var self = this;
     // Discard first 
-    this.wire.readBytes(CHANNELS[channel] + Mode,2, function(err,data){});
+    self.wire.readBytes(CHANNELS[channel] + Mode,2, function(err,data){});
     // Use this callback for returning the adcx-value
-    this.wire.readBytes(CHANNELS[channel] + Mode,2, function(err,data)
+    self.wire.readBytes(CHANNELS[channel] + Mode,2, function(err,data)
     {
         if (err != null) {
             console.log("I2C read error", err);
@@ -60,11 +72,76 @@ ltc2309.prototype.getADCVolt = function(channel,mode,callback)
     self.getADCRaw(channel,mode,function(adcraw)
     {
         var value = (adcraw) * VOLTAGE_FACT;
+        value = Math.round(value * 1000) / 1000;
         callback(value);
     });
 }
+    
+ltc2309.prototype.getADCVoltAll = function(mode, callback)
+{
+    var self = this;
+    self.iterate(8, function(loop)
+    {
+        var i = loop.iteration();
+        self.getADCVolt("adc" + i, UNI_MODE, function(data)
+        {
+            self.CH_Values["adcV"+i] = data;
+            loop.next();
+        });
+        
+    }, function(){
+        callback(self.CH_Values);
+    });
+}
 
-// var adcx = new ltc2309('/dev/i2c-2',0x0A);
+ltc2309.prototype.iterate = function(iterations, process, exit)
+{
+    var self = this;
+    var index = 0, done = false, shouldExit = false;
+    var loop = 
+    {
+        next:function()
+        {
+            if(done)
+            {
+                if(shouldExit && exit);
+                {
+                    
+                }
+            }
+            if(index < iterations)
+            {
+                index++;
+                process(loop);
+            }
+            else
+            {
+                done = true;
+                if(exit)
+                {
+                    exit();
+                }
+            }
+        },
+        iteration:function()
+        {
+            return index - 1;
+        },
+        break:function(end)
+        {
+            done = true;
+            shouldExit = end;
+        }
+    };
+    loop.next();
+};
+
+//var adcx = new ltc2309('/dev/i2c-2',0x0A);
+// adcx.getADCVoltAll(UNI_MODE,function(data)
+// {
+    // console.log(data);
+// });
+
 // adcx.getADCVolt("adc0",UNI_MODE,function(data)
 // {
     // console.log(data);
