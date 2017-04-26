@@ -24,7 +24,7 @@ var ltc2309 = function(device, address)
     this.device = device;
     this.address = address;
     this.wire = new i2c(this.address,{device: this.device});
-    this.CH_Values = 
+    this.CHV_Values = 
     {
         "adcV0": 0x00,
         "adcV1": 0x00,
@@ -34,6 +34,17 @@ var ltc2309 = function(device, address)
         "adcV5": 0x00,
         "adcV6": 0x00,
         "adcV7": 0x00,
+    };
+    this.CHR_Values = 
+    {
+        "adc0": 0x00,
+        "adc1": 0x00,
+        "adc2": 0x00,
+        "adc3": 0x00,
+        "adc4": 0x00,
+        "adc5": 0x00,
+        "adc6": 0x00,
+        "adc7": 0x00,
     };
 }
 
@@ -83,12 +94,29 @@ ltc2309.prototype.getADCVoltAll = function(mode, callback)
         var i = loop.iteration();
         self.getADCVolt("adc" + i, UNI_MODE, function(data)
         {
-            self.CH_Values["adcV"+i] = data;
+            self.CHV_Values["adcV"+i] = data;
             loop.next();
         });
         
     }, function(){
-        callback(self.CH_Values);
+        callback(self.CHV_Values);
+    });
+}
+
+ltc2309.prototype.getADCRawAll = function(mode, callback)
+{
+    var self = this;
+    self.iterate(8, function(loop)
+    {
+        var i = loop.iteration();
+        self.getADCRaw("adc" + i, UNI_MODE, function(data)
+        {
+            self.CHR_Values["adc"+i] = data;
+            loop.next();
+        });
+        
+    }, function(){
+        callback(self.CHR_Values);
     });
 }
 
@@ -135,10 +163,10 @@ ltc2309.prototype.iterate = function(iterations, process, exit)
 };
 
 // Some tests
-//var adcx = new ltc2309('/dev/i2c-2',0x0A);
-// adcx.getADCVoltAll(UNI_MODE,function(data)
+// var adcx = new ltc2309('/dev/i2c-2',0x08);
+// adcx.getADCRawAll(UNI_MODE,function(data)
 // {
-    // console.log(data);
+     // console.log(data);
 // });
 
 // adcx.getADCVolt("adc0",UNI_MODE,function(data)
