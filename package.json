@@ -14,6 +14,9 @@
     "ltc2309"
   ],
   "author": "Jonathan Weinert <jo.weinert@h2o-protec.de>",
+  "dependencies": {
+  "i2c": ">= 0.2.3"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/JW94/LTC2309/issues"
